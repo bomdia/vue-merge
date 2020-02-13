@@ -12,6 +12,7 @@ DeepMerge two object using Vue.set()
 
 
 **VUEX USAGE:**
+
     import Vue from 'vue'
     import VueMerge from '@wtfcode/vue-merge'
 
