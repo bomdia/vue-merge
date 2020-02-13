@@ -1,7 +1,7 @@
 {
 	"name": "@wtfcode/vue-merge",
-	"version": "1.0.0",
-	"description": "Vue Components For Byte Converter Library",
+	"version": "1.0.1",
+	"description": "DeepMerge two object using Vue.set() so the obj remain reactive",
 	"main": "dist/vue-merge.umd.js",
 	"module": "dist/vue-merge.esm.js",
 	"unpkg": "dist/vue-merge.min.js",
@@ -23,6 +23,9 @@
 	"keywords": [
 		"vue",
 		"vuejs",
+		"vuex",
+		"vue merge",
+		"vuex merge",
 		"merge",
 		"merge array",
 		"merge object",

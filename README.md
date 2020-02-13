@@ -11,12 +11,22 @@ DeepMerge two object using Vue.set()
    - **startAt**: '', -- the path where to start on obj ex: 'property1.array1.0' will start on element 0 of array1 a subproperty of property1
 
 
+**VUEX USAGE:**
+    import Vue from 'vue'
+    import VueMerge from '@wtfcode/vue-merge'
+
+    Vue.use(VueMerge) // without this Vue.merge will be undefined
+
+    mutations:{
+      MERGE_STATE: (state, { value, options }) => Vue.merge(state, value, options)
+    }
+
 **USAGE:**
 
     import Vue from 'vue'
     import VueMerge from '@wtfcode/vue-merge'
 
-    Vue.use(VueMerge)
+    Vue.use(VueMerge) // without this Vue.merge will be undefined
 
     obj = {
       property1: {
