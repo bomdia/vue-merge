@@ -52,6 +52,10 @@
         if (startPath.startsWith(pathToTest)) {
           return true
         }
+      } else {
+        if (curSafePath.startsWith(path)) {
+          return true
+        }
       }
     }
     return false
@@ -132,6 +136,7 @@
           recurseObj.append.position++;
         }
       }
+      log('Vue.SET(', checkSafePaths(recurseObj.currentPath.join('.'), safePaths), ')', 'currentPath:', recurseObj.currentPath.join('.'), 'safePaths:', safePaths);
       if (checkSafePaths(recurseObj.currentPath.join('.'), safePaths)) {
         Vue.set(recurseObj.parentObj, parent, value);
       }
