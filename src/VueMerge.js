@@ -31,6 +31,30 @@ const recurseObj = function (obj, path) {
   return retVal
 }
 
+const checkSafePaths = function (path, safePaths) {
+  // path: prop1.0.prop3.prop2
+  // safePaths: *              result = true
+  // safePaths: prop1.0        result = false
+  // safePaths: prop1.0.*      result = true
+  if (typeof path !== 'string') { path = '' }
+  for (const curSafePath of safePaths) {
+    if (
+      curSafePath === '*' ||
+      path === curSafePath
+    ) {
+      return true
+    }
+    const indexOf = curSafePath.indexOf('.*')
+    if (indexOf !== -1) {
+      const startPath = curSafePath.substr(0, indexOf)
+      if (path.startsWith(startPath)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 const setCorrectEmpty = function (obj, key, nextKey) {
   log('setCorrectEmpty(', 'obj =', obj, 'key =', key, 'nextKey=', nextKey, ')')
   const nextKeyIsNum = isNumber(nextKey)
@@ -42,7 +66,7 @@ const setCorrectEmpty = function (obj, key, nextKey) {
   }
 }
 
-const mergeObj = function (obj, value, { ignoreNull, overwrite }, recurseObj = { parent: '', append: {} }) {
+const mergeObj = function (obj, value, { ignoreNull, overwrite, safePaths }, recurseObj = { parent: '', append: {}, currentPath: [] }) {
   if (recurseObj && typeof recurseObj.firstCall === 'undefined') {
     recurseObj.firstCall = true
   } else if (recurseObj && recurseObj.firstCall === true) {
@@ -52,6 +76,10 @@ const mergeObj = function (obj, value, { ignoreNull, overwrite }, recurseObj = {
   log('if !(ignoreNull && value === null) =', !(ignoreNull && value === null))
   log('if recurseObj.parent && recurseObj.parent !== \'\' =', recurseObj.parent && recurseObj.parent !== '')
   log('if recurseObj.parentObj && recurseObj.parentObj instanceof Object) =', recurseObj.parentObj && recurseObj.parentObj instanceof Object)
+  if (recurseObj.parent && recurseObj.parent !== '') {
+    recurseObj.currentPath.push(recurseObj.parent)
+  }
+  log('currentPath: ', recurseObj.currentPath.join('.'))
   if (value && value instanceof Object && Object.keys(value).length > 0) {
     let firstKeyFor = true
     for (const key of Object.keys(value)) {
@@ -80,7 +108,7 @@ const mergeObj = function (obj, value, { ignoreNull, overwrite }, recurseObj = {
       recurseObj.parent = key
       recurseObj.parentObj = obj
       log('recurse with obj:', obj, 'key:', key, 'obj[key]', obj[key])
-      mergeObj((typeof obj[key] === 'undefined' || !(obj[key] instanceof Object) ? obj : obj[key]), value[key], { ignoreNull, overwrite }, recurseObj)
+      mergeObj((typeof obj[key] === 'undefined' || !(obj[key] instanceof Object) ? obj : obj[key]), value[key], { ignoreNull, overwrite, safePaths }, recurseObj)
 
       firstKeyFor = false
     }
@@ -95,19 +123,45 @@ const mergeObj = function (obj, value, { ignoreNull, overwrite }, recurseObj = {
         recurseObj.append.position++
       }
     }
-    Vue.set(recurseObj.parentObj, parent, value)
+    if (checkSafePaths(recurseObj.currentPath.join('.'), safePaths)) {
+      Vue.set(recurseObj.parentObj, parent, value)
+    }
   }
+  recurseObj.currentPath.pop()
+}
+const ensureProperty = function (options, property) {
+  let newObj
+  if (typeof options !== 'object' || typeof options === 'undefined' || options === null) {
+    newObj = {}
+  } else {
+    newObj = deepClone(options)
+  }
+  for (const prop of Object.keys(property)) {
+    if (typeof newObj[prop] === 'undefined' || newObj[prop] === null) {
+      newObj[prop] = property[prop]
+    } else {
+      if (typeof newObj[prop] !== typeof property[prop]) {
+        newObj[prop] = property[prop]
+      }
+    }
+  }
+  return newObj
 }
 
-export default function VueMerge (obj, value, options = { ignoreNull: false, overwrite: false, startAt: '' }) {
+export default function VueMerge (obj, value, options = {}) {
+  options = ensureProperty(options, { ignoreNull: false, overwrite: false, startAt: '', safePaths: ['*'] })
   log('obj', obj, 'value', value, 'options', options)
   const recurse = options.startAt.split('.')
+  const currentPath = []
   let level = 0
   if (options.startAt.length > 0) {
     log('we have a path:', options.startAt)
     log('newPath:', recurse.slice(0, recurse.length - 1).join('.'))
     recurse.reduce((a, b) => {
       log('level:', level)
+      currentPath.push(recurse[level])
+      if (!checkSafePaths(currentPath.join('.'), options.safePaths)) { return null }
+
       if (typeof a[b] === 'undefined' && level !== recurse.length - 1) {
         setCorrectEmpty(a, b, recurse[level + 1])
       }

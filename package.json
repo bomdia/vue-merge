@@ -1,6 +1,6 @@
 {
 	"name": "@wtfcode/vue-merge",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"description": "DeepMerge two object using Vue.set() so the obj remain reactive",
 	"main": "dist/vue-merge.umd.js",
 	"module": "dist/vue-merge.esm.js",
@@ -15,6 +15,7 @@
 		"no-pre-compile-build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/vue-merge.min.js",
 		"lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src build",
 		"lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src build",
+		"manualTest":"yarn build && node build/manualTest.js",
 		"compile-js-wrapper": "yarn lint:fix"
 	},
 	"dependencies": {
@@ -30,6 +31,8 @@
 		"merge array",
 		"merge object",
 		"reactive merge",
+		"safePaths",
+		"whitelistPath",
 		"vue-merge"
 	],
 	"devDependencies": {

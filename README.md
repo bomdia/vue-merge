@@ -9,6 +9,7 @@ DeepMerge two object using Vue.set()
    - **ignoreNull**: false, -- true ignore null found on **value**, false merge null too
    - **overwrite**: false, -- true overwrite the array with the new one, false append new value to the end of existing array
    - **startAt**: '', -- the path where to start on obj ex: 'property1.array1.0' will start on element 0 of array1 a subproperty of property1
+   - **safePaths**: ['\*'], -- an array of path considered safe to modify, default to all, * is the wildcard char ex: prop1.0.*
 
 
 **VUEX USAGE:**
