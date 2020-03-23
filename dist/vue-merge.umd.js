@@ -4,8 +4,8 @@
   (global = global || self, factory(global.VueMerge = {}, global.Vue, global.deepClone));
 }(this, (function (exports, Vue, deepClone) { 'use strict';
 
-  Vue = Vue && Vue.hasOwnProperty('default') ? Vue['default'] : Vue;
-  deepClone = deepClone && deepClone.hasOwnProperty('default') ? deepClone['default'] : deepClone;
+  Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
+  deepClone = deepClone && Object.prototype.hasOwnProperty.call(deepClone, 'default') ? deepClone['default'] : deepClone;
 
   const log = function (...args) {
   };

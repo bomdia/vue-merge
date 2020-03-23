@@ -39,7 +39,7 @@
 		"lodash": "^4.17.15",
 		"require-context": "^1.1.0",
 		"url-join": "^4.0.1",
-		"rollup": "^1.31.0",
+		"rollup": "^2.1.0",
 		"@rollup/plugin-buble": "^0.21.1",
 		"@rollup/plugin-commonjs": "^11.0.2",
 		"@rollup/plugin-node-resolve": "7.1.1",
@@ -47,7 +47,7 @@
 		"vue": "^2.6.11",
 		"vue-template-compiler": "^2.6.11",
 		"eslint": "^6.8.0",
-		"eslint-config-standard": "^14.1.0",
+		"eslint-config-standard": "^14.1.1",
 		"eslint-friendly-formatter": "^4.0.1",
 		"eslint-loader": "^3.0.3",
 		"eslint-plugin-html": "^6.0.0",
@@ -55,7 +55,7 @@
 		"eslint-plugin-node": "^11.0.0",
 		"eslint-plugin-promise": "^4.2.1",
 		"eslint-plugin-standard": "^4.0.1",
-		"eslint-plugin-vue": "^6.1.2"
+		"eslint-plugin-vue": "^6.2.2"
 	},
 	"author": "bomdia",
 	"bugs": {
