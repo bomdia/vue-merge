@@ -1,6 +1,6 @@
 {
 	"name": "@wtfcode/vue-merge",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "DeepMerge two object using Vue.set() so the obj remain reactive",
 	"main": "dist/vue-merge.umd.js",
 	"module": "dist/vue-merge.esm.js",

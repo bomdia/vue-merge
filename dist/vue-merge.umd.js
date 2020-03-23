@@ -47,7 +47,9 @@
       const indexOf = curSafePath.indexOf('.*');
       if (indexOf !== -1) {
         const startPath = curSafePath.substr(0, indexOf);
-        if (path.startsWith(startPath)) {
+        const indexOfPath = path.indexOf(startPath);
+        const pathToTest = indexOfPath > -1 ? path.substr(0, indexOfPath) : path;
+        if (startPath.startsWith(pathToTest)) {
           return true
         }
       }
@@ -88,8 +90,13 @@
             (Array.isArray(recurseObj.parentObj[recurseObj.parent]) && overwrite && Array.isArray(value))
           )
         ) {
-          setCorrectEmpty(recurseObj.parentObj, recurseObj.parent, key);
-          obj = recurseObj.parentObj[recurseObj.parent];
+          recurseObj.currentPath.push(key);
+          log('setCorrectEmpty(', checkSafePaths(recurseObj.currentPath.join('.'), safePaths), ') currentPath:', recurseObj.currentPath.join('.'), 'safePaths:', safePaths);
+          if (checkSafePaths(recurseObj.currentPath.join('.'), safePaths)) {
+            setCorrectEmpty(recurseObj.parentObj, recurseObj.parent, key);
+            obj = recurseObj.parentObj[recurseObj.parent];
+          }
+          recurseObj.currentPath.pop();
         }
 
         recurseObj.append.active = Array.isArray(value);
@@ -103,7 +110,14 @@
         recurseObj.parent = key;
         recurseObj.parentObj = obj;
         log('recurse with obj:', obj, 'key:', key, 'obj[key]', obj[key]);
-        mergeObj((typeof obj[key] === 'undefined' || !(obj[key] instanceof Object) ? obj : obj[key]), value[key], { ignoreNull, overwrite, safePaths }, recurseObj);
+        recurseObj.currentPath.push(key);
+        log('mergeObj(', checkSafePaths(recurseObj.currentPath.join('.'), safePaths), ') currentPath:', recurseObj.currentPath.join('.'), 'safePaths:', safePaths);
+        if (checkSafePaths(recurseObj.currentPath.join('.'), safePaths)) {
+          recurseObj.currentPath.pop();
+          mergeObj((typeof obj[key] === 'undefined' || !(obj[key] instanceof Object) ? obj : obj[key]), value[key], { ignoreNull, overwrite, safePaths }, recurseObj);
+        } else {
+          recurseObj.currentPath.pop();
+        }
 
         firstKeyFor = false;
       }
