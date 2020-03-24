@@ -1,5 +1,6 @@
 const VueMerge = require('../dist/vue-merge.umd.js').VueMerge
-
+const acsm = require('./acsm.js')
+const actionList = require('./actionList.js')
 const obj = {
   pagesReorder: null,
   Theme: {
@@ -143,5 +144,4 @@ const safePaths = [
 ]
 
 const empty = { Theme: { testList: ['dovrebbe', 'essere', 'appeso'], currentTheme: 'Very Purple' }, test: 'test' }
-VueMerge(empty, obj, { safePaths, logs: true })
-console.log('FINAL OBJECT:', JSON.stringify(empty, null, 2))
+console.log('FINAL OBJECT:', JSON.stringify(VueMerge(acsm, actionList, { startAt: 'actionMap', overwrite: true, logs: true }), null, 2))

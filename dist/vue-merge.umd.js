@@ -7,10 +7,8 @@
   Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
   deepClone = deepClone && Object.prototype.hasOwnProperty.call(deepClone, 'default') ? deepClone['default'] : deepClone;
 
-  let DEBUG_FUNCTIONS = true;
-
-  const log = function (...args) {
-    if (DEBUG_FUNCTIONS) {
+  const log = function (logs, ...args) {
+    if (logs) {
       const clonedArgs = deepClone(args);
       console.log(...clonedArgs);
     }
@@ -55,9 +53,9 @@
     return false
   };
 
-  const setCorrectEmpty = function (obj, key, nextKeyIsNum) {
-    log('setCorrectEmpty(', 'obj =', obj, 'key =', key, 'nextKeyisNum=', nextKeyIsNum, ')');
-    log('nextKeyIsNum:', nextKeyIsNum);
+  const setCorrectEmpty = function (obj, key, nextKeyIsNum, logs) {
+    log(logs, 'setCorrectEmpty(', 'obj =', obj, 'key =', key, 'nextKeyisNum=', nextKeyIsNum, ')');
+    log(logs, 'nextKeyIsNum:', nextKeyIsNum);
     if (!nextKeyIsNum) {
       Vue.set(obj, key, {});
     } else {
@@ -84,7 +82,7 @@
     return newObj
   };
 
-  const mergeObj = function (obj, value, { ignoreNull, overwrite, safePaths }, recurseObj = { parent: '', currentPath: [] }) {
+  const mergeObj = function (obj, value, { ignoreNull, overwrite, safePaths, logs }, recurseObj = { parent: '', currentPath: [] }) {
     if (typeof value === 'object' && value !== null) {
       for (const key of Object.keys(value)) {
         recurseObj.currentPath.push(key);
@@ -94,12 +92,12 @@
             if (typeof value[key] === 'object' && value[key] !== null) {
               let objWasEmpty = true;
               for (const nextProp of Object.keys(value[key])) {
-                setCorrectEmpty(obj, key, isNumber(nextProp));
+                setCorrectEmpty(obj, key, isNumber(nextProp), logs);
                 objWasEmpty = false;
                 break
               }
               if (objWasEmpty) {
-                setCorrectEmpty(obj, key, Array.isArray(value[key]));
+                setCorrectEmpty(obj, key, Array.isArray(value[key]), logs);
               }
             }
           }
@@ -115,12 +113,12 @@
             nextObj = obj;
           }
 
-          mergeObj(nextObj, value[key], { ignoreNull, overwrite, safePaths }, recurseObj);
+          mergeObj(nextObj, value[key], { ignoreNull, overwrite, safePaths, logs }, recurseObj);
         }
         recurseObj.currentPath.pop();
       }
     } else if (!(ignoreNull && (value === null || typeof value === 'undefined')) && typeof recurseObj.parent === 'string' && recurseObj.parent !== '') {
-      log('mergeObj Called: obj', obj, 'value', value, 'recurseObj', recurseObj);
+      log(logs, 'mergeObj Called: obj', obj, 'value', value, 'recurseObj', recurseObj);
       let curKey = recurseObj.parent;
 
       if (typeof obj === 'object' && Array.isArray(obj) && !overwrite && isNumber(curKey)) {
@@ -141,20 +139,23 @@
 
   function VueMerge (obj, value, options = {}) {
     options = ensureProperty(options, { ignoreNull: false, overwrite: false, startAt: '', safePaths: ['*'], clone: false, logs: false });
-    DEBUG_FUNCTIONS = options.logs;
-    log('VueMerge Called: obj', obj, 'value', value, 'options', options);
+    log(options.logs, 'VueMerge Called');
+    log(options.logs, 'obj:', obj);
+    log(options.logs, 'value:', value);
+    log(options.logs, 'options:', options);
 
     const curObj = options.clone ? deepClone(obj) : obj;
 
     const recurse = options.startAt.split('.');
     const currentPath = [];
     if (options.startAt.length > 0) {
+      log(options.logs, 'VueMerge recursing startAt:', options.startAt);
       let level = 0;
       let newObj = curObj;
       for (const currentKey of recurse) {
         currentPath.push(currentKey);
-
-        if (checkSafePaths(currentPath.join('.'), options.safePaths)) { return {} }
+        log(options.logs, 'Recursing(', checkSafePaths(currentPath.join('.'), options.safePaths), ') at currentPath:', currentPath.join('.'), 'safePaths:', options.safePaths);
+        if (!checkSafePaths(currentPath.join('.'), options.safePaths)) { return {} }
 
         if (!curObj[currentKey] && level !== recurse.length - 1) {
           setCorrectEmpty(newObj, currentKey, isNumber(recurse[level + 1]));
@@ -162,6 +163,7 @@
         if (level === recurse.length - 1) {
           const newVal = {};
           newVal[currentKey] = value;
+          log('Calling mergeObj with obj:', newObj, 'value:', newVal, 'options:', options, 'recurseObj', { parent: currentKey, currentPath, append: {} });
           mergeObj(newObj, newVal, options, { parent: currentKey, currentPath, append: {} });
         } else {
           level++;
@@ -171,6 +173,7 @@
     } else if (typeof value !== 'object') {
       return {}
     } else {
+      log('Calling mergeObj with obj:', curObj, 'value:', value, 'options:', options);
       mergeObj(curObj, value, options);
     }
     return curObj
