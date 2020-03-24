@@ -152,13 +152,13 @@ function VueMerge (obj, value, options = {}) {
       if (!checkSafePaths(currentPath.join('.'), options.safePaths)) { return {} }
 
       if (!curObj[currentKey] && level !== recurse.length - 1) {
-        setCorrectEmpty(newObj, currentKey, isNumber(recurse[level + 1]));
+        setCorrectEmpty(newObj, currentKey, isNumber(recurse[level + 1]), options.logs);
       }
       if (level === recurse.length - 1) {
         const newVal = {};
         newVal[currentKey] = value;
-        log('Calling mergeObj with obj:', newObj, 'value:', newVal, 'options:', options, 'recurseObj', { parent: currentKey, currentPath, append: {} });
-        mergeObj(newObj, newVal, options, { parent: currentKey, currentPath, append: {} });
+        log(options.logs, 'Calling mergeObj with obj:', newObj, 'value:', newVal, 'options:', options, 'recurseObj', { parent: currentKey, currentPath, append: {} });
+        mergeObj(newObj, newVal, options, { parent: currentKey, currentPath });
       } else {
         level++;
         newObj = newObj[currentKey];
@@ -167,7 +167,7 @@ function VueMerge (obj, value, options = {}) {
   } else if (typeof value !== 'object') {
     return {}
   } else {
-    log('Calling mergeObj with obj:', curObj, 'value:', value, 'options:', options);
+    log(options.logs, 'Calling mergeObj with obj:', curObj, 'value:', value, 'options:', options);
     mergeObj(curObj, value, options);
   }
   return curObj

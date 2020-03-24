@@ -144,4 +144,4 @@ const safePaths = [
 ]
 
 const empty = { Theme: { testList: ['dovrebbe', 'essere', 'appeso'], currentTheme: 'Very Purple' }, test: 'test' }
-console.log('FINAL OBJECT:', JSON.stringify(VueMerge(acsm, actionList, { startAt: 'actionMap', overwrite: true, logs: true }), null, 2))
+console.log('FINAL OBJECT:', JSON.stringify(VueMerge(acsm, actionList, { startAt: 'actionMap', overwrite: true }), null, 2))
