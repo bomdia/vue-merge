@@ -157,7 +157,7 @@
         log(options.logs, 'Recursing(', checkSafePaths(currentPath.join('.'), options.safePaths), ') at currentPath:', currentPath.join('.'), 'safePaths:', options.safePaths);
         if (!checkSafePaths(currentPath.join('.'), options.safePaths)) { return {} }
 
-        if (!curObj[currentKey] && level !== recurse.length - 1) {
+        if (!newObj[currentKey] && level !== recurse.length - 1) {
           setCorrectEmpty(newObj, currentKey, isNumber(recurse[level + 1]), options.logs);
         }
         if (level === recurse.length - 1) {
