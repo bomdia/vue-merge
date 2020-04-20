@@ -8,7 +8,8 @@ DeepMerge two object using Vue.set()
 - **value** -- the object with the new thing, can be nested as wanted, can be a value if **options.startAt** is a non empty path
 - **options** -- an object with the options
    - **ignoreNull**: false, -- true ignore null found on **value**, false merge null too
-   - **overwrite**: false, -- true overwrite the array with the new one, false append new value to the end of existing array
+   - **ignoreUndefined**: false, -- true ignore undefined found on **value**, false remove the key from obj
+   - **overwrite**: false, -- true overwrite the array with the new one and set empty obj, false append new value to the end of existing array
    - **startAt**: '', -- the path where to start on obj ex: 'property1.array1.0' will start on element 0 of array1 a subproperty of property1
    - **safePaths**: ['\*'], -- an array of path considered safe to modify, default to all, * is the wildcard char ex: prop1.0.*
    - **clone**: false, --if the obj will we deepCloned using lodash.clonedeep

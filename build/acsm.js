@@ -5,7 +5,36 @@ module.exports = {
     actions: []
   },
   servers: {
-    instances: {}
+    instances: {
+      'cHN5Y2xhbg==': {
+        'ZnJpZW5kdGVzdA==': {
+          _id: 'ZnJpZW5kdGVzdA==',
+          _rev: '388-914a5bf7267e053ac4a736cce96fc20a',
+          name: 'friendtest',
+          title: "psyclan friend's test server",
+          serverTemplateName: 'ac1202vanilla',
+          executionPath: 'D:\\org.psyclan.cube.server.space\\psyclan\\servers\\friendtest\\',
+          status: 'STOPPED',
+          registerStatus: 'UNREGISTERED',
+          autoStarting: false,
+          toKeepStarted: true
+        },
+        'cHVibGljdGVzdA==': {
+          _id: 'cHVibGljdGVzdA==',
+          _rev: '3145-579c2671b540bdaf983ff82691103dad',
+          name: 'publictest',
+          title: 'psyclan public test server',
+          serverTemplateName: 'ac1202vanilla',
+          executionPath: 'D:\\org.psyclan.cube.server.space\\psyclan\\servers\\publictest\\',
+          status: 'RUNNING',
+          registerStatus: 'REGISTERED',
+          masterServer: 'ms.cubers.net:28760',
+          users: [],
+          autoStarting: true,
+          toKeepStarted: true
+        }
+      }
+    }
   },
   session: {
     authStatus: {
