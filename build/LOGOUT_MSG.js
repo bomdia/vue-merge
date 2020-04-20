@@ -2,9 +2,7 @@ module.exports = {
   when: 1585669659073,
   action: 'LOGOUT',
   targetDiff: {
-    users: {
-      0: null
-    }
+    users: [null]
   },
   type: 'org.psyclan.cube.space.dispatcher.event.UserStatusEvent',
   targetServer: 'cHVibGljdGVzdA==',

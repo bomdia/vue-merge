@@ -122,7 +122,7 @@
             typeof newValue === 'number' ||
             typeof newValue === 'string' ||
             typeof newValue === 'symbol' ||
-            (overwrite && typeof newValue === 'object' && Object.keys(newValue).length === 0)
+            (overwrite && typeof newValue === 'object' && (Object.keys(newValue).length === 0 || Array.isArray(newValue)))
           ) { // set cases
             log(logs, 'mergeObj setting');
             log(logs, 'mergeObj obj:', obj);
