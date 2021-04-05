@@ -25,4 +25,4 @@ if (GlobalVue) {
 
 export default plugin
 
-export var VueMerge = VueMerge_
+export const VueMerge = VueMerge_

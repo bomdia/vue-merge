@@ -84,7 +84,7 @@ const ensureProperty = function (options, property) {
   return newObj
 };
 
-const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite, safePaths, logs }, recurseObj = { currentPath: [] }) {
+const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite, replaceArray, safePaths, logs }, recurseObj = { currentPath: [] }) {
   if (typeof value === 'object' && value !== null) {
     for (const key of Object.keys(value)) {
       recurseObj.currentPath.push(key);
@@ -95,10 +95,10 @@ const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite,
         if (typeof obj[key] === 'undefined' || typeof obj[key] !== typeof value[key] || obj[key] === null) {
           if (typeof value[key] === 'object' && value[key] !== null) {
             let objWasEmpty = true;
-            for (const nextProp of Object.keys(value[key])) {
-              setCorrectEmpty(obj, key, isNumber(nextProp), logs);
+            if (Object.keys(value[key]) > 0) {
+              const firstProp = Object.keys(value[key])[0];
+              setCorrectEmpty(obj, key, isNumber(firstProp), logs);
               objWasEmpty = false;
-              break
             }
             if (objWasEmpty) {
               setCorrectEmpty(obj, key, Array.isArray(value[key]), logs);
@@ -116,6 +116,7 @@ const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite,
           typeof newValue === 'number' ||
           typeof newValue === 'string' ||
           typeof newValue === 'symbol' ||
+          (replaceArray && Array.isArray(obj[key])) ||
           (overwrite && typeof newValue === 'object' && (Object.keys(newValue).length === 0 || Array.isArray(newValue)))
         ) { // set cases
           log(logs, 'mergeObj setting');
@@ -140,7 +141,7 @@ const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite,
             }
           } else { // recurse cases
             log(logs, 'mergeObj recursing to next');
-            mergeObj(obj[key], newValue, { ignoreNull, ignoreUndefined, overwrite, safePaths, logs }, recurseObj);
+            mergeObj(obj[key], newValue, { ignoreNull, ignoreUndefined, overwrite, replaceArray, safePaths, logs }, recurseObj);
           }
         }
       }
@@ -149,8 +150,8 @@ const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite,
   }
 };
 
-function VueMerge (obj, value, options = {}) {
-  options = ensureProperty(options, { ignoreNull: false, ignoreUndefined: false, overwrite: false, startAt: '', safePaths: ['*'], clone: false, logs: false });
+function VueMerge$1 (obj, value, options = {}) {
+  options = ensureProperty(options, { ignoreNull: false, ignoreUndefined: false, overwrite: false, replaceArray: false, startAt: '', safePaths: ['*'], clone: false, logs: false });
   log(options.logs, 'VueMerge Called');
   log(options.logs, 'obj:', obj);
   log(options.logs, 'value:', value);
@@ -194,7 +195,7 @@ function VueMerge (obj, value, options = {}) {
 function install (Vue) {
   if (install.installed) { return }
   install.installed = true;
-  Vue.merge = VueMerge;
+  Vue.merge = VueMerge$1;
 }
 
 // Create module definition for Vue.use()
@@ -214,7 +215,7 @@ if (GlobalVue) {
   GlobalVue.use(plugin);
 }
 
-var VueMerge$1 = VueMerge;
+const VueMerge = VueMerge$1;
 
 export default plugin;
-export { VueMerge$1 as VueMerge };
+export { VueMerge };

@@ -1,15 +1,17 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('lodash.clonedeep')) :
   typeof define === 'function' && define.amd ? define(['exports', 'vue', 'lodash.clonedeep'], factory) :
-  (global = global || self, factory(global.VueMerge = {}, global.Vue, global.deepClone));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.VueMerge = {}, global.Vue, global.deepClone));
 }(this, (function (exports, Vue, deepClone) { 'use strict';
 
-  Vue = Vue && Object.prototype.hasOwnProperty.call(Vue, 'default') ? Vue['default'] : Vue;
-  deepClone = deepClone && Object.prototype.hasOwnProperty.call(deepClone, 'default') ? deepClone['default'] : deepClone;
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
+  var deepClone__default = /*#__PURE__*/_interopDefaultLegacy(deepClone);
 
   const log = function (logs, ...args) {
     if (logs) {
-      const clonedArgs = deepClone(args);
+      const clonedArgs = deepClone__default['default'](args);
       const newArgs = [];
       for (const arg of clonedArgs) {
         if (typeof arg === 'object') {
@@ -65,9 +67,9 @@
     log(logs, 'setCorrectEmpty(', 'obj =', obj, 'key =', key, 'nextKeyisNum=', nextKeyIsNum, ')');
     log(logs, 'nextKeyIsNum:', nextKeyIsNum);
     if (!nextKeyIsNum) {
-      Vue.set(obj, key, {});
+      Vue__default['default'].set(obj, key, {});
     } else {
-      Vue.set(obj, key, []);
+      Vue__default['default'].set(obj, key, []);
     }
   };
 
@@ -76,7 +78,7 @@
     if (typeof options !== 'object' || typeof options === 'undefined' || options === null) {
       newObj = {};
     } else {
-      newObj = deepClone(options);
+      newObj = deepClone__default['default'](options);
     }
     for (const prop of Object.keys(property)) {
       if (typeof newObj[prop] === 'undefined' || newObj[prop] === null) {
@@ -90,7 +92,7 @@
     return newObj
   };
 
-  const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite, safePaths, logs }, recurseObj = { currentPath: [] }) {
+  const mergeObj = function (obj, value, { ignoreNull, ignoreUndefined, overwrite, replaceArray, safePaths, logs }, recurseObj = { currentPath: [] }) {
     if (typeof value === 'object' && value !== null) {
       for (const key of Object.keys(value)) {
         recurseObj.currentPath.push(key);
@@ -101,10 +103,10 @@
           if (typeof obj[key] === 'undefined' || typeof obj[key] !== typeof value[key] || obj[key] === null) {
             if (typeof value[key] === 'object' && value[key] !== null) {
               let objWasEmpty = true;
-              for (const nextProp of Object.keys(value[key])) {
-                setCorrectEmpty(obj, key, isNumber(nextProp), logs);
+              if (Object.keys(value[key]) > 0) {
+                const firstProp = Object.keys(value[key])[0];
+                setCorrectEmpty(obj, key, isNumber(firstProp), logs);
                 objWasEmpty = false;
-                break
               }
               if (objWasEmpty) {
                 setCorrectEmpty(obj, key, Array.isArray(value[key]), logs);
@@ -122,19 +124,20 @@
             typeof newValue === 'number' ||
             typeof newValue === 'string' ||
             typeof newValue === 'symbol' ||
+            (replaceArray && Array.isArray(obj[key])) ||
             (overwrite && typeof newValue === 'object' && (Object.keys(newValue).length === 0 || Array.isArray(newValue)))
           ) { // set cases
             log(logs, 'mergeObj setting');
             log(logs, 'mergeObj obj:', obj);
             log(logs, 'mergeObj key:', key);
             log(logs, 'mergeObj newValue:', newValue);
-            Vue.set(obj, key, newValue);
+            Vue__default['default'].set(obj, key, newValue);
           } else if (!ignoreUndefined && typeof newValue === 'undefined') { // remove cases
             log(logs, 'mergeObj removing');
             log(logs, 'mergeObj obj:', obj);
             log(logs, 'mergeObj key:', key);
             log(logs, 'mergeObj newValue:', newValue);
-            Vue.delete(obj, key);
+            Vue__default['default'].delete(obj, key);
           } else if (typeof newValue === 'object' && Object.keys(newValue).length > 0) {
             if (!overwrite && Array.isArray(newValue) && Array.isArray(obj[key])) { // append cases
               for (const val of newValue) {
@@ -142,11 +145,11 @@
                 log(logs, 'mergeObj obj[key]:', obj[key]);
                 log(logs, 'mergeObj obj[key].length:', obj[key].length);
                 log(logs, 'mergeObj val:', val);
-                Vue.set(obj[key], obj[key].length, val);
+                Vue__default['default'].set(obj[key], obj[key].length, val);
               }
             } else { // recurse cases
               log(logs, 'mergeObj recursing to next');
-              mergeObj(obj[key], newValue, { ignoreNull, ignoreUndefined, overwrite, safePaths, logs }, recurseObj);
+              mergeObj(obj[key], newValue, { ignoreNull, ignoreUndefined, overwrite, replaceArray, safePaths, logs }, recurseObj);
             }
           }
         }
@@ -155,14 +158,14 @@
     }
   };
 
-  function VueMerge (obj, value, options = {}) {
-    options = ensureProperty(options, { ignoreNull: false, ignoreUndefined: false, overwrite: false, startAt: '', safePaths: ['*'], clone: false, logs: false });
+  function VueMerge$1 (obj, value, options = {}) {
+    options = ensureProperty(options, { ignoreNull: false, ignoreUndefined: false, overwrite: false, replaceArray: false, startAt: '', safePaths: ['*'], clone: false, logs: false });
     log(options.logs, 'VueMerge Called');
     log(options.logs, 'obj:', obj);
     log(options.logs, 'value:', value);
     log(options.logs, 'options:', options);
 
-    const curObj = options.clone ? deepClone(obj) : obj;
+    const curObj = options.clone ? deepClone__default['default'](obj) : obj;
 
     const recurse = options.startAt.split('.');
     const currentPath = [];
@@ -200,7 +203,7 @@
   function install (Vue) {
     if (install.installed) { return }
     install.installed = true;
-    Vue.merge = VueMerge;
+    Vue.merge = VueMerge$1;
   }
 
   // Create module definition for Vue.use()
@@ -220,9 +223,9 @@
     GlobalVue.use(plugin);
   }
 
-  var VueMerge$1 = VueMerge;
+  const VueMerge = VueMerge$1;
 
-  exports.VueMerge = VueMerge$1;
+  exports.VueMerge = VueMerge;
   exports.default = plugin;
 
   Object.defineProperty(exports, '__esModule', { value: true });
